@@ -1,1 +1,505 @@
- Mabayi Music MarketVersion 3: Player + Add Song demo + Buy + Download.GitHub Pages can host the website, but real uploads, accounts, payments and a private music library require a backend/database.
+<!DOCTYPE html>
+<html lang="rn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mabayi Music Market</title>
+  <meta name="description" content="Mabayi Music Market - Umuziki n'amavideo y'abahanzi b'Abarundi. Isoko ry'umuziki.">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', system-ui, Arial, sans-serif;
+      background: #0b0b12;
+      color: #fff;
+      line-height: 1.5;
+    }
+    header {
+      padding: 16px 6%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #11111b;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      border-bottom: 1px solid #222;
+    }
+    .logo { font-size: 22px; font-weight: 800; }
+    .logo span { color: #f5b400; }
+    nav a {
+      color: #ddd;
+      text-decoration: none;
+      margin-left: 18px;
+      font-size: 14px;
+      transition: color 0.2s;
+    }
+    nav a:hover { color: #f5b400; }
+    .hero {
+      padding: 80px 6%;
+      background: linear-gradient(135deg, #17172a 0%, #0b0b12 100%);
+    }
+    .hero h1 {
+      font-size: 48px;
+      max-width: 700px;
+      margin-bottom: 16px;
+      line-height: 1.15;
+    }
+    .hero p {
+      color: #bbb;
+      font-size: 18px;
+      max-width: 580px;
+      margin-bottom: 24px;
+    }
+    .btn {
+      display: inline-block;
+      background: #f5b400;
+      color: #111;
+      padding: 13px 22px;
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      font-size: 15px;
+      transition: transform 0.15s, background 0.2s;
+    }
+    .btn:hover { background: #ffc933; transform: translateY(-1px); }
+    .btn-outline {
+      background: transparent;
+      border: 2px solid #f5b400;
+      color: #f5b400;
+    }
+    .btn-outline:hover { background: #f5b400; color: #111; }
+    section { padding: 50px 6%; }
+    h2 { margin-bottom: 24px; font-size: 28px; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 20px;
+    }
+    .card {
+      background: #151520;
+      border-radius: 14px;
+      padding: 16px;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 30px rgba(0,0,0,0.4);
+    }
+    .cover {
+      height: 180px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #2a2a42, #f5b400);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 48px;
+      margin-bottom: 12px;
+      overflow: hidden;
+    }
+    .cover img { width: 100%; height: 100%; object-fit: cover; }
+    .card h3 { margin: 0 0 4px; font-size: 16px; }
+    .muted { color: #999; font-size: 13px; }
+    .play {
+      display: flex;
+      gap: 8px;
+      margin-top: 14px;
+    }
+    .play button {
+      border: 0;
+      border-radius: 8px;
+      padding: 9px 14px;
+      background: #262637;
+      color: white;
+      cursor: pointer;
+      font-size: 13px;
+      flex: 1;
+      transition: background 0.2s;
+    }
+    .play button:hover { background: #35354a; }
+    .play button.playing { background: #f5b400; color: #111; font-weight: 700; }
+    .upload-box {
+      background: #151520;
+      border: 2px dashed #444;
+      padding: 36px 24px;
+      border-radius: 16px;
+      text-align: center;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    .upload-box p { color: #aaa; margin-bottom: 20px; }
+    .upload-form {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      text-align: left;
+      margin-top: 20px;
+    }
+    .upload-form input, .upload-form select {
+      padding: 12px 14px;
+      border-radius: 8px;
+      border: 1px solid #333;
+      background: #1c1c28;
+      color: #fff;
+      font-size: 14px;
+    }
+    .upload-form label {
+      font-size: 13px;
+      color: #bbb;
+      margin-bottom: -6px;
+    }
+    footer {
+      padding: 40px 6%;
+      color: #777;
+      text-align: center;
+      background: #08080d;
+      border-top: 1px solid #1a1a22;
+      margin-top: 40px;
+    }
+    .now-playing {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #16161f;
+      border-top: 1px solid #2a2a35;
+      padding: 12px 6%;
+      display: none;
+      align-items: center;
+      gap: 16px;
+      z-index: 200;
+    }
+    .now-playing.active { display: flex; }
+    .now-playing .info { flex: 1; }
+    .now-playing .title { font-weight: 600; font-size: 14px; }
+    .now-playing .artist { font-size: 12px; color: #999; }
+    .np-controls button {
+      background: #f5b400;
+      border: none;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    audio { display: none; }
+    @media (max-width: 650px) {
+      .hero h1 { font-size: 32px; }
+      nav a { margin-left: 10px; font-size: 13px; }
+      .hero { padding: 50px 6%; }
+      section { padding: 36px 6%; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">Mabayi <span>Music Market</span> 🇧🇮</div>
+    <nav>
+      <a href="#music">Music</a>
+      <a href="#videos">Videos</a>
+      <a href="#artists">Artists</a>
+      <a href="#upload">Upload</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <h1>Umuziki wacu, isoko ryacu.</h1>
+      <p>Karibu kuri Mabayi Music Market — urubuga rwo kumviriza, kumenyekanisha no kudandaza indirimbo n'amavideo y'abahanzi b'Abarundi.</p>
+      <a class="btn" href="#music">Tora indirimbo 🎵</a>
+      <a class="btn btn-outline" href="#upload" style="margin-left:10px;">Shiramwo indirimbo</a>
+    </section>
+
+    <!-- MUSIC -->
+    <section id="music">
+      <h2>🎵 Indirimbo nshasha</h2>
+      <div class="grid" id="music-grid">
+        <!-- Songs will be injected here -->
+      </div>
+    </section>
+
+    <!-- VIDEOS -->
+    <section id="videos">
+      <h2>🎬 Ama-video</h2>
+      <div class="grid">
+        <div class="card">
+          <div class="cover">▶️</div>
+          <h3>Video nshasha</h3>
+          <div class="muted">Mabayi Music Market</div>
+        </div>
+        <div class="card">
+          <div class="cover">🎥</div>
+          <h3>Music Video</h3>
+          <div class="muted">Abahanzi bacu</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ARTISTS -->
+    <section id="artists">
+      <h2>👤 Abahanzi</h2>
+      <div class="grid" id="artists-grid">
+        <div class="card">
+          <h3>Umuhanzi wa mbere</h3>
+          <div class="muted">Indirimbo 0 · Videos 0</div>
+        </div>
+        <div class="card">
+          <h3>Mabayi Artist</h3>
+          <div class="muted">Indirimbo 0 · Videos 0</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- UPLOAD -->
+    <section id="upload">
+      <h2>📤 Shiramwo indirimbo</h2>
+      <div class="upload-box">
+        <p>Abahanzi bashobora gushiramwo indirimbo zabo hano. Indirimbo zawe zizagaragara ku site (local).</p>
+        
+        <form class="upload-form" id="upload-form">
+          <label>Izina ry'indirimbo</label>
+          <input type="text" id="song-title" placeholder="Urugero: Mabayi Vibes" required>
+          
+          <label>Izina ry'umuhanzi</label>
+          <input type="text" id="song-artist" placeholder="Urugero: Jean Marie" required>
+          
+          <label>Hitamo dosiye (MP3 / Audio)</label>
+          <input type="file" id="song-file" accept="audio/*" required>
+          
+          <button type="submit" class="btn" style="margin-top:10px;">Shiramwo indirimbo ✓</button>
+        </form>
+        
+        <p id="upload-status" style="margin-top:16px;color:#f5b400;font-weight:600;"></p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    © 2026 Mabayi Music Market · Burundi 🇧🇮<br>
+    <small>Umuziki wacu, isoko ryacu</small>
+  </footer>
+
+  <!-- Now Playing Bar -->
+  <div class="now-playing" id="now-playing">
+    <div class="info">
+      <div class="title" id="np-title">—</div>
+      <div class="artist" id="np-artist">—</div>
+    </div>
+    <div class="np-controls">
+      <button id="np-play-btn">▶</button>
+    </div>
+  </div>
+
+  <audio id="audio-player"></audio>
+
+  <script>
+    // ============ DEFAULT SONGS ============
+    const defaultSongs = [
+      {
+        id: "default-1",
+        title: "Indirimbo ya mbere",
+        artist: "Umuhanzi mushasha",
+        emoji: "🎵",
+        src: null
+      },
+      {
+        id: "default-2",
+        title: "Mabayi Vibes",
+        artist: "Mabayi Artist",
+        emoji: "🎶",
+        src: null
+      },
+      {
+        id: "default-3",
+        title: "New Amapiano",
+        artist: "Burundi Artist",
+        emoji: "🔥",
+        src: null
+      }
+    ];
+
+    // Load songs from localStorage
+    function getSongs() {
+      const saved = localStorage.getItem("mabayi_songs");
+      if (saved) {
+        try {
+          return JSON.parse(saved);
+        } catch (e) {
+          return [...defaultSongs];
+        }
+      }
+      return [...defaultSongs];
+    }
+
+    function saveSongs(songs) {
+      // We only save the metadata + base64 for uploaded ones
+      localStorage.setItem("mabayi_songs", JSON.stringify(songs));
+    }
+
+    let songs = getSongs();
+    let currentSongId = null;
+    const audio = document.getElementById("audio-player");
+    const nowPlaying = document.getElementById("now-playing");
+    const npTitle = document.getElementById("np-title");
+    const npArtist = document.getElementById("np-artist");
+    const npPlayBtn = document.getElementById("np-play-btn");
+
+    // ============ RENDER MUSIC ============
+    function renderMusic() {
+      const grid = document.getElementById("music-grid");
+      grid.innerHTML = "";
+
+      songs.forEach(song => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `
+          <div class="cover">${song.emoji || "🎵"}</div>
+          <h3>${escapeHtml(song.title)}</h3>
+          <div class="muted">${escapeHtml(song.artist)}</div>
+          <div class="play">
+            <button class="play-btn" data-id="${song.id}">▶ Play</button>
+            <button class="buy-btn" data-title="${escapeHtml(song.title)}">💰 Buy</button>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+
+      // Attach events
+      document.querySelectorAll(".play-btn").forEach(btn => {
+        btn.addEventListener("click", () => playSong(btn.dataset.id));
+      });
+      document.querySelectorAll(".buy-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          alert(`Murakoze! "Buy" system izokorwa muri version ikurikira.\n\nIndirimbo: ${btn.dataset.title}`);
+        });
+      });
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement("div");
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // ============ PLAYER ============
+    function playSong(id) {
+      const song = songs.find(s => s.id === id);
+      if (!song) return;
+
+      // Reset all play buttons
+      document.querySelectorAll(".play-btn").forEach(b => {
+        b.textContent = "▶ Play";
+        b.classList.remove("playing");
+      });
+
+      if (currentSongId === id && !audio.paused) {
+        audio.pause();
+        npPlayBtn.textContent = "▶";
+        currentSongId = null;
+        return;
+      }
+
+      currentSongId = id;
+      npTitle.textContent = song.title;
+      npArtist.textContent = song.artist;
+      nowPlaying.classList.add("active");
+
+      if (song.src) {
+        audio.src = song.src;
+        audio.play().catch(() => {
+          alert("Ntabwo dosiye y'umuziki yashoboye gukina. Gerageza indi.");
+        });
+        npPlayBtn.textContent = "⏸";
+      } else {
+        // No real audio file
+        audio.removeAttribute("src");
+        alert(`"${song.title}" ntabwo ifite dosiye y'umuziki.\n\nShiramwo indirimbo yawe ukoresheje Upload kugira ngo ukine.`);
+        npPlayBtn.textContent = "▶";
+      }
+
+      // Highlight button
+      const btn = document.querySelector(`.play-btn[data-id="${id}"]`);
+      if (btn) {
+        btn.textContent = "⏸ Pause";
+        btn.classList.add("playing");
+      }
+    }
+
+    npPlayBtn.addEventListener("click", () => {
+      if (!currentSongId) return;
+      if (audio.paused) {
+        audio.play();
+        npPlayBtn.textContent = "⏸";
+      } else {
+        audio.pause();
+        npPlayBtn.textContent = "▶";
+      }
+    });
+
+    audio.addEventListener("ended", () => {
+      npPlayBtn.textContent = "▶";
+      document.querySelectorAll(".play-btn").forEach(b => {
+        b.textContent = "▶ Play";
+        b.classList.remove("playing");
+      });
+    });
+
+    // ============ UPLOAD ============
+    document.getElementById("upload-form").addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      const title = document.getElementById("song-title").value.trim();
+      const artist = document.getElementById("song-artist").value.trim();
+      const fileInput = document.getElementById("song-file");
+      const status = document.getElementById("upload-status");
+
+      if (!title || !artist || !fileInput.files[0]) {
+        status.textContent = "Uzuza byose neza.";
+        return;
+      }
+
+      const file = fileInput.files[0];
+      if (!file.type.startsWith("audio/")) {
+        status.textContent = "Hitamo dosiye y'umuziki (MP3, WAV, etc.)";
+        return;
+      }
+
+      status.textContent = "Birimo gushiramwo...";
+
+      const reader = new FileReader();
+      reader.onload = function(ev) {
+        const newSong = {
+          id: "up-" + Date.now(),
+          title: title,
+          artist: artist,
+          emoji: "🎵",
+          src: ev.target.result   // base64 data URL
+        };
+
+        songs.unshift(newSong); // add to top
+        saveSongs(songs);
+        renderMusic();
+
+        status.textContent = `✓ "${title}" yashizwe neza!`;
+        document.getElementById("upload-form").reset();
+
+        // Scroll to music
+        setTimeout(() => {
+          document.getElementById("music").scrollIntoView({ behavior: "smooth" });
+        }, 600);
+      };
+      reader.onerror = function() {
+        status.textContent = "Habaye ikosa. Gerageza nanone.";
+      };
+      reader.readAsDataURL(file);
+    });
+
+    // Initial render
+    renderMusic();
+  </script>
+</body>
+</html>
